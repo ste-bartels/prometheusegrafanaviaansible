@@ -1,0 +1,45 @@
+---
+
+- name: download prometheus rabbitmq exporter binary
+  get_url:
+    url: "{{ prometheus_rabbitmq_exporter_url }}"
+    dest: "{{ prometheus_exporters_common_dist_dir }}/{{ prometheus_rabbitmq_exporter_release_name }}.tar.gz"
+
+- name: unarchive binary tarball
+  unarchive:
+    copy: no
+    src: "{{ prometheus_exporters_common_dist_dir }}/{{ prometheus_rabbitmq_exporter_release_name }}.tar.gz"
+    dest: "{{ prometheus_exporters_common_dist_dir }}"
+    creates: "{{ prometheus_exporters_common_dist_dir }}/{{ prometheus_rabbitmq_exporter_release_name }}/rabbitmq_exporter"
+  register: prometheus_rabbitmq_exporter_updated
+  notify:
+    - restart rabbitmq exporter
+
+- name: update group and owner for files
+  file:
+    path: "{{ prometheus_rabbitmq_exporter_release_name }}"
+    state: directory
+    recurse: yes
+    owner: "{{ prometheus_exporters_common_user}}"
+    group: "{{ prometheus_exporters_common_group }}"
+  when: prometheus_rabbitmq_exporter_updated is changed
+
+- name: create systemd service unit
+  template:
+    src: etc/systemd/system/prometheus-rabbitmq-exporter.service.j2
+    dest: /etc/systemd/system/prometheus-rabbitmq-exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  when: ansible_service_mgr == 'systemd'
+  notify:
+    - rabbitmq exporter service reenable
+    - restart rabbitmq exporter
+
+- meta: flush_handlers
+
+- name: ensure prometheus rabbitmq exporter service is enabled and started
+  service:
+    name: prometheus-rabbitmq-exporter
+    state: started
+    enabled: yes

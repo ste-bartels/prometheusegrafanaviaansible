@@ -1,0 +1,4 @@
+---
+# roles/grafana/vars/main.yml
+
+version: 10.2.6

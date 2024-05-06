@@ -1,0 +1,48 @@
+---
+- name: 4linux Node Exporter
+  hosts: prometheus_node_exporter
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus_node_exporter
+
+- name: 4linux RabbitMQ Exporter
+  hosts: prometheus_rabbitmq_exporter
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus_rabbitmq_exporter
+
+- name: 4linux docker Exporter
+  hosts: prometheus_docker_exporter
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus_docker_exporter
+
+- name: 4linux Mysql Exporter
+  hosts: prometheus_mysql_exporter
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:      
+    - prometheus_mysql_exporter  
+
+- name: 4linux Prometheus
+  hosts: prometheus
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - prometheus 
+
+- name: 4linux Grafana
+  hosts: grafana
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - grafana

@@ -1,0 +1,47 @@
+- name: Creating mysql_exporter user group
+  group: name="{{mysql_exporter_group}}"
+  become: true
+
+- name: Creating mysql_exporter user
+  user:
+    name: "{{mysql_exporter_user}}"
+    group: "{{mysql_exporter_group}}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{mysql_exporter_user}} nologin User"
+    createhome: "no"
+    state: present
+
+- name: Create directory for MySQL Exporter
+  file:
+    path: /opt/mysql_exporter
+    state: directory
+
+- name: Download MySQL Exporter binary
+  get_url:
+    url: "https://github.com/prometheus/mysqld_exporter/releases/download/v{{ mysql_exporter_version }}/mysqld_exporter-{{ mysql_exporter_version }}.linux-amd64.tar.gz"
+    dest: /opt/mysql_exporter/mysqld_exporter.tar.gz
+
+- name: Extract MySQL Exporter
+  ansible.builtin.unarchive:
+    src: /opt/mysql_exporter/mysqld_exporter.tar.gz
+    dest: /opt/mysql_exporter
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Cleanup MySQL Exporter tarball
+  file:
+    path: /opt/mysql_exporter/mysqld_exporter.tar.gz
+    state: absent
+
+- name: Set permissions for MySQL Exporter
+  file:
+    path: /opt/mysql_exporter
+    mode: "0755"
+
+- name: Create systemd service file for MySQL Exporter
+  template:
+    src: mysql_exporter.service.j2
+    dest: /etc/systemd/system/mysql_exporter.service
+  notify: restart mysql_exporter
+

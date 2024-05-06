@@ -1,0 +1,13 @@
+- name: restart docker_exporter
+  service:
+    name: docker
+    state: restarted
+
+- name: restart containers_docker_composer
+  shell: docker-compose -f /opt/app-devops/docker-compose.yml down && docker-compose -f /opt/app-devops/docker-compose.yml up -d && sleep 15 && docker exec app-devops_rabbitmq_1 rabbitmq-plugins enable rabbitmq_management
+
+- name: restart rabbitmq_exporter
+  service:
+    name: rabbitmq_exporter
+    state: restarted
+    enabled: yes

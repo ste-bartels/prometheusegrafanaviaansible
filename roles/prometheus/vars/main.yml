@@ -1,0 +1,12 @@
+---
+# roles/prometheus/vars/main.yml
+
+node_exporter: "34.173.131.184"
+mysql_exporter: "34.173.131.184"
+rabbitmq_exporter: "34.173.131.184"
+docker_exporter: "34.173.131.184"
+serviceName: "prometheus"
+userId: "prometheus"
+groupId: "prometheus"
+exec_command: "/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.conf --storage.tsdb.path=/data/prometheus --storage.tsdb.retention=2d"
+version: "2.50.0"

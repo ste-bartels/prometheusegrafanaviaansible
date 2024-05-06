@@ -1,0 +1,13 @@
+- name: Eviar arquivo para o Docker Daemon JSON for Exporter
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+  notify: restart docker_exporter
+
+- name: Reiniciar os Serviços do Docker Composer
+  shell: docker ps 
+  notify: restart containers_docker_composer 
+
+- name: Ativa porta do container e Reinicia o Servico do RabbitMQ Exporter
+  shell: echo "Reiniciando o Service do Rabbit Exporter"
+  notify: restart rabbitmq_exporter

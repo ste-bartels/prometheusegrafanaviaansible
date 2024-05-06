@@ -1,0 +1,44 @@
+# roles/grafana/tasks/main.yml 
+- name: Instalar dependências
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - adduser
+    - libfontconfig1
+    - musl
+  become: yes
+
+- name: Baixar pacote Grafana
+  get_url:
+    url: "https://dl.grafana.com/enterprise/release/grafana-enterprise_10.2.6_amd64.deb"
+    dest: "/tmp/grafana-enterprise_10.2.6_amd64.deb"
+
+- name: Instalar pacote Grafana
+  apt:
+    deb: "/tmp/grafana-enterprise_10.2.6_amd64.deb"
+    state: present
+  become: yes
+
+- name: "Grafana configuration file copy"
+  template:
+    src: "grafana.conf.j2"
+    dest: /etc/grafana/grafana.ini
+  notify: event_restart_grafana
+
+- name: "Grafana server started"
+  service:
+    name: grafana-server
+    enabled: true
+    state: started
+
+- name: Verificar se o Grafana está acessível
+  uri:
+    url: "http://127.0.0.1:3000"
+    method: GET
+  register: grafana_response
+
+- name: Exibir status do Grafana
+  debug:
+    msg: "Grafana está acessível: {{ grafana_response.status == 200 }}"
+

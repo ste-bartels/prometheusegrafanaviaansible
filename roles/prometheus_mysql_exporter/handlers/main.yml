@@ -1,0 +1,6 @@
+- name: restart mysql_exporter
+  systemd:
+    name: mysql_exporter
+    state: restarted
+    enabled: yes 
+

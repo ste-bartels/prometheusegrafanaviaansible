@@ -1,0 +1,53 @@
+- name: Creating rabbitmq_exporter user group
+  group: name="{{rabbitmq_exporter_group}}"
+  become: true
+
+- name: Creating rabbitmq_exporter user
+  user:
+    name: "{{rabbitmq_exporter_user}}"
+    group: "{{rabbitmq_exporter_group}}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{rabbitmq_exporter_user}} nologin User"
+    createhome: "no"
+    state: present
+
+- name: Create directory for RabbitMQ Exporter
+  file:
+    path: /opt/rabbitmq_exporter
+    state: directory
+
+- name: Download RabbitMQ Exporter binary
+  get_url:
+    url: "https://github.com/kbudde/rabbitmq_exporter/releases/download/v1.0.0/rabbitmq_exporter_1.0.0_linux_amd64.tar.gz"
+    dest: /opt/rabbitmq_exporter/rabbitmq_exporter.tar.gz
+
+- name: Extract RabbitMQ Exporter
+  ansible.builtin.unarchive:
+    src: /opt/rabbitmq_exporter/rabbitmq_exporter.tar.gz
+    dest: /opt/rabbitmq_exporter
+    remote_src: yes
+#    extra_opts: [--strip-components=1]
+
+- name: Cleanup RabbitMQ Exporter tarball
+  file:
+    path: /opt/rabbitmq_exporter/mysqld_exporter.tar.gz
+    state: absent
+
+- name: Set permissions for RabbitMQ Exporter
+  file:
+    path: /opt/rabbitmq_exporter
+    mode: "0755"
+
+- name: Create systemd service file for RabbitMQ Exporter
+  template:
+    src: rabbitmq_exporter.service.j2
+    dest: /etc/systemd/system/rabbitmq_exporter.service
+
+- name: Reload system daemon-reload
+  shell: echo "SystemCTL Daemon Reload"
+  notify: reload rabbitmq_systemd
+
+- name: Reinicia o Servico do RabbitMQ Exporter
+  shell: echo "Reiniciando o Service do Rabbit Exporter"
+  notify: restart rabbitmq_exporter

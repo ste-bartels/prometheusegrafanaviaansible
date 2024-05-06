@@ -1,0 +1,24 @@
+# roles/grafana/tasks/main.yml
+      
+- name: Install grafana
+  apt:
+    name: "https://dl.grafana.com/enterprise/release/grafana-enterprise_{{ version }}_amd64.deb"
+    state: latest    
+
+- name: "Grafana configuration file copy"
+  template:
+    src: "grafana.conf.j2"
+    dest: /etc/grafana/grafana.ini
+  notify: event_restart_grafana
+
+- name: "Grafana server started"
+  service:
+    name: grafana-server
+    enabled: true
+    state: started
+
+- name: "Check if Grafana is accessible."
+  uri:
+    url: http://127.0.0.1:3000
+    method: GET
+    status_code: 200

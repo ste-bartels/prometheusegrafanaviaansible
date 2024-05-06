@@ -1,0 +1,4 @@
+---
+mysql_exporter_version: "0.14.0"
+mysql_exporter_user: "mysql_exporter"
+mysql_exporter_group: "mysql_exporter"
