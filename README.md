@@ -37,28 +37,51 @@ O ansible foi construido, seguindo as boas práticas utilizando as roles de form
     |- prometheus_docker_exporter
                        |-...
 
-Invetory possue os hosts, expecifico de cada step, com o processo de acesso via ssh.
+O arquivo Inventory possui os hosts específicos de cada etapa, com o processo de acesso via SSH.
 
-Playbook executa as task (funções) de forma seguimentada, através acionamento das roles.
+O playbook executa as tasks de forma sequencial, acionando as roles.
 
-Roles apresenta de forma individualizada cada instalação, contendo as tasks, templates (arquivos de configurações de referencia), vars (variavéis) e handles (tasks que são executadas apenas se forem notificadas).
+As roles apresentam de forma individualizada cada instalação, contendo as tasks, templates (arquivos de configuração de referência), vars (variáveis) e handlers (tasks executadas apenas se notificadas).
 
-Servidor
-O processo de instalação foi toda realizada via ansible, com instalação do prometheus, Grafana e node-exporter (para monitoramento da propria maquina de servidor).
+## Servidor
 
-Cliente
-Para a realização das configurações dos exporters foi necessário a auteração do docker-compose adicionando o mapeamento de portas do Mysql e Rabbit. 
-Foi necessária a adição das regras de criação de usuário para o Mysql-exporter e a liberação de permissões para o mesmo no script create-database.sql. Essa alteração se fez necessária para que o usuario do exporter fosse criado sempre que o container reiniciasse.
+A instalação foi realizada inteiramente via Ansible, incluindo Prometheus, Grafana e Node-exporter, para monitoramento da própria máquina do servidor.
 
-Com exceção do Docker-exporter todas as instalações foram realizadas apartir do dowload do pacote via repositório web, seguindo pela descompactação, ajustes e criação dos arquivos de serviço, pertimindo a administração do serviço utilizando o systemd. Já o docker que permite por padrão a exposição de métricas, foi necessário criar o arquivo daemon.json no /etc/docker. Reiniciando o serviço para a leitura das novas configurações.
-  
-E alguns dashboard do Grafana o ajuste de quais metricas estavam sendo apresentadas foi realizado, pois nem todos dashboard padrão contemplava as meetricas que o exporter continha.
+## Cliente
 
-Foram criados 5 dashboards 
-- Containers Stats: Com o básico sobre a o status dos containers
-- full server Status: Contem 2 dashboards (sendo necessário selecionar o node-exporter no job e qual host - servidor ou cliente - quer visualizar)
-- mysql exporter dashboard : Apresentação uma coleção bem completa de metricas do Mysql
-- RabbitMQ metrics : Com as métricas referente as filas e status do mesmo.
+Para configurar os exporters, foi necessário modificar o docker-compose adicionando o mapeamento de portas do MySQL e RabbitMQ. Também foram adicionadas regras de criação de usuário para o MySQL-exporter e liberação de permissões no script create-database.sql. Essas alterações foram feitas para garantir que o usuário do exporter fosse criado sempre que o container reiniciasse.
+
+Com exceção do Docker-exporter, todas as instalações foram feitas baixando o pacote via repositório web, seguido pela descompactação, ajustes e criação de arquivos de serviço, permitindo a administração do serviço utilizando o systemd. Para o Docker, que por padrão permite a exposição de métricas, foi necessário criar o arquivo daemon.json em /etc/docker, reiniciando o serviço para ler as novas configurações.
+
+### Grafana
+
+Grafana
+Ajustes foram feitos nos dashboards para selecionar as métricas corretas, já que nem todos os dashboards padrão contemplavam as métricas fornecidas pelos exporters.
+
+Foram criados 5 dashboards:
+
+1. **Containers Stats:** Apresenta informações básicas sobre o status dos containers.
+
+2. **Full Server Status:** Contém 2 dashboards (sendo necessário selecionar o node-exporter no job e qual host - servidor ou cliente - visualizar).
+
+3. **MySQL Exporter Dashboard:** Apresenta uma coleção completa de métricas do MySQL.
+
+4. **RabbitMQ Metrics:** Exibe métricas relacionadas às filas e status do RabbitMQ.
 
 
-  
+### Utilizando o projeto
+
+1. Faça o clone do repositório:
+
+```
+https://github.com/ste-bartels/prometheusegrafanaviaansible.git
+```
+
+2. Altere o arquivo `inventory.ini`, modifique o endereço IP das máquinas e o caminho da sua chave privada, certifique-se de selecionar a role desejada para cada host.
+
+3. Modifique o arquivo `ansible.cfg`, informando o seu usuário de serviço para execução do projeto. 
+
+4. Execute o playbook com o comando a seguir:
+```
+ansible-playbook -i inventory.ini playbook.yml
+```
