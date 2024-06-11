@@ -1,13 +1,8 @@
 # prometheusegrafanaviaansible
 Instalação do prometheus, exporters e grafana via ansible
 
-Foram recebidas 2 maquinas virtuais Servidor e Cliente, ambas localizadas na GCP.
 A Cliente possue 4 containers em funcionamento ( mysql, rabbit, phyton e node)
-Como solicitado foi intalado no Servidor o Prometheus, Grafana e o node-exporter e no cliente foram instalados os exporters do node, do Mysql, do rabbit e do docker. tudo isso via Ansible. Gerando 5 dashboards no Grafana com as respectivas métricas. em um prazo de 4 dias, começando a contar da sexta-feira (03/05/2024) a tarde.
-
-Como relatado, parte desse desafio já havia sido realizado posteriormente e com isso um conhecimento e documentação previa.
-Por se tratar de um "desafio", me propus a automatizar via ansible já que não o tinha realizado dessa forma. 
-No sabádo pela manhã já tinha finalizado a parte que tinha conhecimento previo, Prometheus, Grafana e Node-exporter, percebendo que ainda havia tempo hábil mantive o desenvolvimento via ansible.
+Como solicitado foi intalado no Servidor o Prometheus, Grafana e o node-exporter e no cliente foram instalados os exporters do node, do Mysql, do rabbit e do docker. tudo isso via Ansible. Gerando 5 dashboards no Grafana com as respectivas métricas. 
   
 O ansible foi construido, seguindo as boas práticas utilizando as roles de forma hierarquica, com a estrutura a seguir:
 
